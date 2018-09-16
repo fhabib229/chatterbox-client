@@ -1,7 +1,7 @@
 // YOUR CODE HERE:
 
 var app = {
-
+  friendsList: {}
 };
 app.init = function () {};
 app.send = function (message) {
@@ -46,6 +46,20 @@ app.renderMessage = function(message) {
   //   $('.username').append('<div></div>');
   // };
   // addFriend();
+  // var storeMessage = message.username;
+  // $('.username').click(function(storeMessage) {
+  //   $('.friend').append('<div></div>');
+  // });
+};
+app.handleUsernameClick = function() {
+  // make an object to store usernames
+  // add usernames to this object and set the value to true
+  // var username = this.username;
+  // $('.username').click(function(username) {
+  //   $('.friend').append('<div></div>');
+  // });
+
+  app.friendsList[username] = true;
 };
 app.renderRoom = function() {
   $('#roomSelect').append('<div></div>');
