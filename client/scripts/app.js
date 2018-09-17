@@ -23,12 +23,20 @@ app.send = function (message) {
 app.fetch = function(message) {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
-    url: undefined,
+    url: 'http://parse.rpt.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
-    data: JSON.stringify(message),
+    data: JSON,
     contentType: 'application/json',
     success: function (data) {
-      console.log('chatterbox: Message sent');
+      console.log('Data: ' + JSON.stringify(data));
+      // iterate through results
+        // if index in results has username and text properties
+          //append username and text properties to chat
+      for (var i = 0; i < data.results.length; i++) {
+        if (data.results[i].username && data.results[i].text) {
+          $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + data.results[i].username +':' + ' ' + data.results[i].text);
+        }
+      }
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -40,7 +48,8 @@ app.clearMessages = function() {
   $('#chats').empty();
 };
 app.renderMessage = function(message) {
-  $('#chats').append('<div></div>');
+  $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + message.username+':' + ' ' + message.text);
+
   //$('.username').append('<div></div>');
   // app.addFriend = function() {
   //   $('.username').append('<div></div>');
@@ -51,22 +60,28 @@ app.renderMessage = function(message) {
   //   $('.friend').append('<div></div>');
   // });
 };
-app.handleUsernameClick = function() {
-  // make an object to store usernames
-  // add usernames to this object and set the value to true
-  // var username = this.username;
-  // $('.username').click(function(username) {
-  //   $('.friend').append('<div></div>');
-  // });
 
-  app.friendsList[username] = true;
-};
 app.renderRoom = function() {
   $('#roomSelect').append('<div></div>');
 };
 
 
 $(document).ready(function() {
+  app.handleUsernameClick = function() {
+    // make an object to store usernames
+    // add usernames to this object and set the value to true
+    // var username = this.username;
+    // $('.username').click(function(username) {
+    //   $('.friend').append('<div></div>');
+    // });
+
+    //app.friendsList[username] = true;
+    $('.username').click(function() {
+      $('.friend').append('<div></div>');
+    });
+  };
+
+  app.fetch();
   //app.init = function () {};
   // app.send = function () {};
   // $.ajax({
