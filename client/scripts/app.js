@@ -12,7 +12,8 @@ app.send = function (message) {
     data: JSON.stringify(message),
     contentType: 'application/json',
     success: function (data) {
-      console.log('chatterbox: Message sent');
+      console.log('Message sent successfully');
+      setTimeout(function() { app.fetch(); }, 1000);
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -25,14 +26,13 @@ app.fetch = function(message) {
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.rpt.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
-    data: JSON,
+    dataType: 'json',
     contentType: 'application/json',
     success: function (data) {
-      console.log('Data: ' + JSON.stringify(data));
       // iterate through results
-        // if index in results has username and text properties
-          //append username and text properties to chat
-      for (var i = 0; i < data.results.length; i++) {
+      // if index in results has username and text properties
+      //append username and text properties to chat
+      for (var i = data.results.length - 1; i >= 0; i--) {
         if (data.results[i].username && data.results[i].text) {
           $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + data.results[i].username +':' + ' ' + data.results[i].text);
         }
@@ -40,7 +40,7 @@ app.fetch = function(message) {
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to send message', data);
+      console.error('chatterbox: Failed to fetch messages', data);
     }
   });
 };
@@ -81,7 +81,13 @@ $(document).ready(function() {
     });
   };
 
+  var message = {
+    username: 'Bob',
+    text: 'Hello Bob',
+    roomname: 'Bob\'s room'
+  };
   app.fetch();
+  app.send(message);
   //app.init = function () {};
   // app.send = function () {};
   // $.ajax({
