@@ -15,7 +15,7 @@ app.send = function (message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('Message sent successfully');
-      setTimeout(function() { app.fetch(); }, 1000);
+      setTimeout(function() { app.fetch(); }, 500);
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -105,10 +105,11 @@ $(document).ready(function() {
   };
 
   var message = {
-    username: 'Rick Sanchez',
-    text: 'I\'m TINY RICK',
+    username: 'Mr. Meeseeks',
+    text: '<img src="images/meeseeks.gif" height="500" width="500">',
     roomname: 'C137'
   };
+
   app.fetch();
   app.send(message);
   //app.init = function () {};
