@@ -1,7 +1,9 @@
 // YOUR CODE HERE:
 
 var app = {
-  friendsList: {}
+  username: '',
+  roomname: {},
+  messages: []
 };
 app.init = function () {};
 app.send = function (message) {
@@ -26,16 +28,31 @@ app.fetch = function(message) {
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.rpt.hackreactor.com/chatterbox/classes/messages',
     type: 'GET',
+    data: {
+      order: '-createdAt'
+    },
     dataType: 'json',
     contentType: 'application/json',
     success: function (data) {
       // iterate through results
       // if index in results has username and text properties
       //append username and text properties to chat
-      for (var i = data.results.length - 1; i >= 0; i--) {
-        if (data.results[i].username && data.results[i].text) {
-          $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + data.results[i].username +':' + ' ' + data.results[i].text);
+      //console.log('Data: ' + JSON.stringify(data));
+      console.log(JSON.stringify(app.roomname));
+      for (var i = 0; i < data.results.length; i++) {
+        if (data.results[i].username && data.results[i].text && data.results[i].roomname) {
+          if (!app.roomname.hasOwnProperty(data.results[i].roomname)) {
+            app.roomname[data.results[i].roomname] = data.results[i].roomname;
+          }
+          //console.log(JSON.stringify('rooms: ' + JSON.stringify(app.roomname[data.results[i].roomname])));
+          if (app.antiHack(data.results[i].text)) {
+            $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + data.results[i].username + ':' + ' ' + data.results[i].text);
+          }
         }
+      }
+      for (var key in app.roomname) {
+        console.log('rooms: ' + key);
+        $('#roomSelect').append('<option>' + app.roomname[key] + '</option>');
       }
     },
     error: function (data) {
@@ -60,9 +77,15 @@ app.renderMessage = function(message) {
   //   $('.friend').append('<div></div>');
   // });
 };
-
 app.renderRoom = function() {
   $('#roomSelect').append('<div></div>');
+};
+app.antiHack = function(text) {
+  if (text.startsWith('<script>')) {
+    return false;
+  } else {
+    return true;
+  }
 };
 
 
@@ -82,9 +105,9 @@ $(document).ready(function() {
   };
 
   var message = {
-    username: 'Bob',
-    text: 'Hello Bob',
-    roomname: 'Bob\'s room'
+    username: 'Rick Sanchez',
+    text: 'I\'m TINY RICK',
+    roomname: 'C137'
   };
   app.fetch();
   app.send(message);
