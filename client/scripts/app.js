@@ -3,10 +3,14 @@
 var app = {
   username: '',
   roomname: {},
+  $message: $('#message').val(),
   messages: []
 };
-app.init = function () {};
+
+app.init = function () {
+};
 app.send = function (message) {
+
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.rpt.hackreactor.com/chatterbox/classes/messages',
@@ -15,15 +19,17 @@ app.send = function (message) {
     contentType: 'application/json',
     success: function (data) {
       console.log('Message sent successfully');
-      setTimeout(function() { app.fetch(); }, 500);
+      // for (var i = 0; i < data.results.length; i++) {
+      //   $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + data.results[i].username + ':' + ' ' + data.results[i].text);
+      // }
     },
     error: function (data) {
       // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
-      console.error('chatterbox: Failed to send message', data);
+      console.error('chatterbox: Failed to send message', JSON.stringify(data));
     }
   });
 };
-app.fetch = function(message) {
+app.fetch = function() {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.rpt.hackreactor.com/chatterbox/classes/messages',
@@ -39,6 +45,7 @@ app.fetch = function(message) {
       for (var i = 0; i < data.results.length; i++) {
         if (data.results[i].username && data.results[i].text && data.results[i].roomname) {
           if (!app.roomname.hasOwnProperty(data.results[i].roomname)) {
+            app.username[data.results[i].username] = data.results[i].username;
             app.roomname[data.results[i].roomname] = data.results[i].roomname;
           }
           if (app.antiHack(data.results[i].text)) {
@@ -100,13 +107,25 @@ $(document).ready(function() {
     });
   };
 
+  // var message = {
+  //   username: 'It\'s WORKING',
+  //   text: '<img src="images/takemyenergy.gif" height="400" width="400">',
+  //   roomname: 'Lobby'
+  // };
+
+  app.init();
+  app.fetch();
   var message = {
-    username: 'It\'s WORKING',
-    text: '<img src="images/takemyenergy.gif" height="400" width="400">',
-    roomname: 'Lobby'
+    username: window.location.search,
+    text: app.message,
+    roomname: 'lobby',
   };
 
-  app.fetch();
-  app.send(message);
+  $('#add-message').on('click', function() {
+    message.text = $('#message').val();
+    console.log('Message' + JSON.stringify(message));
+    app.send(message);
+    setTimeout(function() { app.fetch(); }, 1000);
+  });
 
 });
