@@ -34,6 +34,8 @@ app.fetch = function(message) {
     dataType: 'json',
     contentType: 'application/json',
     success: function (data) {
+      // Need to figure out how to set the current room and fetch messages for that room
+      // When the room is changed, the messages should change to be the messages that correspond to that room
       for (var i = 0; i < data.results.length; i++) {
         if (data.results[i].username && data.results[i].text && data.results[i].roomname) {
           if (!app.roomname.hasOwnProperty(data.results[i].roomname)) {
@@ -74,14 +76,15 @@ app.renderRoom = function() {
   $('#roomSelect').append('<div></div>');
 };
 app.antiHack = function(text) {
-  if (text.startsWith('<script>')) {
+  if (text.startsWith('<script>') || text.includes('$') || text.includes('console.log')) {
     return false;
   } else {
     return true;
   }
 };
 
-
+// When username is clicked, add as a friend
+// Display all messages sent by friends in bold
 $(document).ready(function() {
   app.handleUsernameClick = function() {
     // make an object to store usernames
@@ -98,8 +101,8 @@ $(document).ready(function() {
   };
 
   var message = {
-    username: 'A Concerned Citizen',
-    text: '༼ つ ◕_◕ ༽つ RPT10 TAKE MY ENERGY TO FINISH THIS SPRINT ༼ つ ◕_◕ ༽つ',
+    username: 'It\'s WORKING',
+    text: '<img src="images/takemyenergy.gif" height="400" width="400">',
     roomname: 'Lobby'
   };
 
