@@ -9,8 +9,8 @@ var app = {
 
 app.init = function () {
 };
-app.send = function (message) {
 
+app.send = function (message) {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
     url: 'http://parse.rpt.hackreactor.com/chatterbox/classes/messages',
@@ -29,6 +29,7 @@ app.send = function (message) {
     }
   });
 };
+
 app.fetch = function() {
   $.ajax({
     // This is the url you should use to communicate with the parse API server.
@@ -54,7 +55,15 @@ app.fetch = function() {
         }
       }
       for (var key in app.roomname) {
+        // store all the new rooms
+        //var rooms = {};
         $('#roomSelect').append('<option>' + app.roomname[key] + '</option>');
+        //if the user has a roomname add roomname to options
+        if (!app.roomname[key]) {
+          $('#roomSelect').append('<option>' + key + '</option>');
+        }
+        // set room values to true for constant time lookup
+        //rooms[roomname] = true;
       }
     },
     error: function (data) {
@@ -63,25 +72,38 @@ app.fetch = function() {
     }
   });
 };
+
 app.clearMessages = function() {
   $('#chats').empty();
 };
-app.renderMessage = function(message) {
-  $('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + message.username+':' + ' ' + message.text);
 
-  //$('.username').append('<div></div>');
-  // app.addFriend = function() {
-  //   $('.username').append('<div></div>');
-  // };
-  // addFriend();
-  // var storeMessage = message.username;
-  // $('.username').click(function(storeMessage) {
-  //   $('.friend').append('<div></div>');
-  // });
+app.renderMessage = function(message) {
+  //$('#chats').append('<div class="chat">' + '<span class="username" data-user></span></div>' + message.username+':' + ' ' + message.text);
+  //iterate through roomnames
+  console.log('Message: ' + JSON.stringify(message.roomname));
+  console.log('App:' + JSON.stringify(app.rommname));
+  for (var key in app.roomname) {
+    if (app.roomname.hasOwnProperty(message.roomname)) {
+      return true;
+    } else if (message.roomname === app.roomname) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+    // if the roomname doesnt exist or its the lobby
+    // return true;
+    // else if message.roomname is === to app.roomname
+    //return true
+    // else return false
+    // only messages that return true get rendered
+
 };
+
 app.renderRoom = function() {
   $('#roomSelect').append('<div></div>');
 };
+
 app.antiHack = function(text) {
   if (text.startsWith('<script>') || text.includes('$') || text.includes('console.log')) {
     return false;
@@ -90,8 +112,28 @@ app.antiHack = function(text) {
   }
 };
 
+// function for when someone changes rooms
+app.changeRooms = function(event, message) {
+  console.log('success');
+  var checkRoom = $('#roomSelect').prop('chosenRoom');
+  // if its the first option
+  // create a new room
+  if (checkRoom === 0) {
+    var roomname = prompt('What room?');
+    // if the roomname doesnt exist make the room
+    if (roomname) {
+      $('#roomSelect').val(roomname);
+    }
+  } else {
+    // move to an existing room with that name
+    roomname = $('#roomSelect').val();
+  }
+
+  app.renderMessage(message);
+};
 // When username is clicked, add as a friend
 // Display all messages sent by friends in bold
+
 $(document).ready(function() {
   app.handleUsernameClick = function() {
     // make an object to store usernames
@@ -127,5 +169,5 @@ $(document).ready(function() {
     app.send(message);
     setTimeout(function() { app.fetch(); }, 1000);
   });
-
+  $('#roomSelect').on('change', (app.changeRooms(event, message)));
 });
